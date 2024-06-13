@@ -5,6 +5,7 @@ import static java.lang.System.exit;
 public class Main {
 
     public static void main(String[] args) {
+        ViewBalance vb=new ViewBalance();
         BankAccount[] arrBank = new BankAccount[10];
         BankAccount admin = new BankAccount(CustomerType.Admin, "Admin");
         BankAccount user1 = new BankAccount( 12345678, 0, "User", "", "user@gmail.com", "unknown", 707219789);
@@ -17,11 +18,7 @@ public class Main {
         System.out.println("----------------------------------");
         System.out.println("user \nName: " + user1.getName() + "\nEmail: " + user1.getEmail() + "\nPassword: " + user1.getPassword());
         selectedAccount = Login(selectedAccount, arrBank);
-        chooseOperation(selectedAccount, arrBank, accountCounter);
-
-        //Hesab balansına və əvvəlcədən müəyyən edilmiş
-        // faiz dərəcəsinə əsaslanaraq faizi hesablamaq üçün bir üsul müəyyənləşdirin.
-        //Faizləri mütəmadi olaraq hesab balansına tətbiq edin (məsələn, aylıq).
+        chooseOperation(selectedAccount, arrBank, accountCounter,vb);
     }
 
     private static void invalidInput(BankAccount selectedAccount) throws InvalidAccountException {
@@ -68,7 +65,7 @@ public class Main {
         return selectedAccount;
     }
 
-    private static void chooseOperation(BankAccount selectedAccount, BankAccount[] arrBank, int accountCounter) {
+    private static void chooseOperation(BankAccount selectedAccount, BankAccount[] arrBank, int accountCounter, ViewBalance vb) {
         System.out.printf("""
                                 
                 Display(1)
@@ -77,6 +74,7 @@ public class Main {
                 Transfer(4)
                 Change Account(5)
                 Create New Account (Bank has %s empty location)(6)
+                Display balance(7)
                 Exit(-1)
                 Enter (int):""", (10 - accountCounter));
         Scanner sr = new Scanner(System.in);
@@ -91,29 +89,29 @@ public class Main {
                 switch (sr.nextInt()){
                     case 1 -> {
                         System.out.println(selectedAccount);
-                        chooseOperation(selectedAccount,arrBank,accountCounter);
+                        chooseOperation(selectedAccount,arrBank,accountCounter,vb);
                     }
                     case 2-> {
                         selectedAccount.displayHistory();
-                        chooseOperation(selectedAccount,arrBank,accountCounter);
+                        chooseOperation(selectedAccount,arrBank,accountCounter,vb);
                     }
-                        default ->chooseOperation(selectedAccount,arrBank,accountCounter);
+                        default ->chooseOperation(selectedAccount,arrBank,accountCounter,vb);
                 }
             }
             case 2 -> {
                 selectedAccount.deposit();
-                chooseOperation(selectedAccount, arrBank, accountCounter);
+                chooseOperation(selectedAccount, arrBank, accountCounter,vb);
             }
             case 3 -> {
                 selectedAccount.withdraw();
-                chooseOperation(selectedAccount, arrBank, accountCounter);
+                chooseOperation(selectedAccount, arrBank, accountCounter,vb);
             }
             case 4 -> { selectedAccount.transfer(arrBank);
-                chooseOperation(selectedAccount,arrBank,accountCounter);
+                chooseOperation(selectedAccount,arrBank,accountCounter,vb);
             }
             case 5 -> {
                 selectedAccount=Login(selectedAccount, arrBank);
-                chooseOperation(selectedAccount,arrBank,accountCounter);
+                chooseOperation(selectedAccount,arrBank,accountCounter,vb);
             }
             case 6 -> {
                 if (accountCounter < 10) {
@@ -121,23 +119,24 @@ public class Main {
                     selectedAccount=arrBank[accountCounter];
                     System.out.println(arrBank[accountCounter]);
                     accountCounter++;
-                    chooseOperation(selectedAccount, arrBank, accountCounter);
+                    chooseOperation(selectedAccount, arrBank, accountCounter,vb);
 
                 } else {
                     System.out.println("Bank is full please delete some account.");
                 }
             }
+            case 7 -> vb.viewMethode(selectedAccount);
             case -1 -> {
                 System.out.print("Do you want to Exit?\nYes(1),No(2):");
                 if (sr.nextInt() == 1) {
                     exit(1);
                 } else {
-                    chooseOperation(selectedAccount, arrBank, accountCounter);
+                    chooseOperation(selectedAccount, arrBank, accountCounter,vb);
                 }
             }
             default -> {
                 System.out.print("Please enter valid number!");
-                chooseOperation(selectedAccount, arrBank, accountCounter);
+                chooseOperation(selectedAccount, arrBank, accountCounter,vb);
             }
         }
     }
