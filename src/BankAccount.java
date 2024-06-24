@@ -1,5 +1,7 @@
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class BankAccount extends Customer {
@@ -7,7 +9,7 @@ public class BankAccount extends Customer {
     private final int accountNumber;
     private int balance;
     private TransactionStatus transactionStatus=TransactionStatus.WAIT;
-    private final String[] date=new String[1000];
+    private final List<String> date=new ArrayList<>();
 
     public int getAccountNumber() {
         return accountNumber;
@@ -30,16 +32,10 @@ public class BankAccount extends Customer {
         int input = sr.nextInt();
         InsufficientFundsException(input, 0, "Your Input must be grater than or equals 0.");
         this.balance += input;
-        for (int i = 0; i < 1000; i++) {
-            if (date[i]==null){
-                date[i]= "Deposit " + input + " Balance " + balance +
-                         " Date " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-                break;
-            }
-            if (i==999&&date[i]!=null){
-                System.out.println("Memory is full that is why we cannot save in history.");
-            }
-        }
+
+                date.add("Deposit " + input + " Balance " + balance +
+                         " Date " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+
         System.out.println("\nYou deposit " + input + "$ and your current balance is " + this.balance + "$.");
     }
 
@@ -70,21 +66,13 @@ public class BankAccount extends Customer {
             int input = sr.nextInt();
             InsufficientFundsException(this.balance, input, "Your Input must be less than or equals " + this.balance + "$.");
             this.balance-=input;
-            for (int i = 0; i < 1000; i++) {
-                if (date[i]==null){
-                    date[i]= "Withdraw " + input + " Balance " + balance +
-                             " Date " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-                    break;
-                }
-                if (i==999&&date[i]!=null){
-                    System.out.println("Memory is full that is why we cannot save in history.");
-                }
-            }
+            date.add("Deposit " + input + " Balance " + balance +
+                     " Date " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             System.out.println("\nYou withdraw " + input + "$ and your current balance is " + this.balance + "$.");
         }
     }
 
-    public void transfer( BankAccount[] arrBank) {
+    public void transfer( List<BankAccount> arrBank) {
         BankAccount transferAccount = null;
         Scanner sr = new Scanner(System.in);
         if (this.balance < 0) {
@@ -121,23 +109,10 @@ public class BankAccount extends Customer {
             this.balance-=input;
             transferAccount.setBalance(transferAccount.getBalance()+input);
             this.transactionStatus=TransactionStatus.SUCCESS;
-            for (int i = 0; i < 1000; i++) {
-                if (date[i]==null){
-                    date[i]= "Transfer " + input + " Balance " + balance +" transferAccount "+transferAccount.getAccountNumber()+
-                             " Date " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-                    break;
-                }
-                if (i==999&&date[i]!=null){
-                    System.out.println("Memory is full that is why we cannot save in history.");
-                }
-            }
-            for (int i = 0; i < 1000; i++) {
-                if (transferAccount.date[i]==null){
-                    transferAccount.date[i]= "Transfer " + input + " Balance " + transferAccount.balance +" transferAccount "+accountNumber+
-                             " Date " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-                    break;
-                }
-            }
+            date.add("Deposit " + input + " Balance " + balance +
+                     " Date " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            transferAccount.date.add("Deposit " + input + " Balance " + balance +
+                     " Date " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             System.out.println("\nYou transfer " + input + "$ and your current balance is " + this.balance + "$(transactionStatus="+this.transactionStatus+").");
             this.transactionStatus=TransactionStatus.WAIT;
         }
@@ -145,14 +120,12 @@ public class BankAccount extends Customer {
 
     public void displayHistory() {
         System.out.println("\n");
-        for (int i = 0; i < 1000; i++) {
-            if (date[i]==null&&i==0){
-                System.out.println("History is empty ");
-                break;
+        if (date.size()==0){
+            System.out.println("History is empty ");
+        }else {
+            for(String s :date){
+                System.out.println(s);
             }
-            if (date[i]==null)
-                break;
-            System.out.println(date[i]);
         }
     }
 
@@ -171,7 +144,7 @@ public class BankAccount extends Customer {
         this.balance = balance;
     }
 
-    public BankAccount(BankAccount[] arr) {
+    public BankAccount(List<BankAccount> arr) {
         Scanner sr = new Scanner(System.in);
         Scanner sr1 = new Scanner(System.in);
         System.out.print("Name(cannot contain @):");

@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import static java.lang.System.exit;
@@ -6,11 +8,11 @@ public class Main {
 
     public static void main(String[] args) {
         ViewBalance vb=new ViewBalance();
-        BankAccount[] arrBank = new BankAccount[10];
+        List<BankAccount> arrBank =new ArrayList<>();
         BankAccount admin = new BankAccount(CustomerType.Admin, "Admin");
         BankAccount user1 = new BankAccount( 12345678, 0, "User", "", "user@gmail.com", "unknown", 707219789);
-        arrBank[0] = admin;
-        arrBank[1] = user1;
+        arrBank.add(admin);
+        arrBank.add(user1);
         System.out.println(admin+"  "+user1);
         int accountCounter = 2;
         BankAccount selectedAccount = null;
@@ -31,7 +33,7 @@ public class Main {
         }
     }
 
-    private static BankAccount Login(BankAccount selectedAccount, BankAccount[] arrBank) {
+    private static BankAccount Login(BankAccount selectedAccount, List<BankAccount> arrBank) {
         System.out.print("""
                                                  Log in
                 """);
@@ -39,9 +41,9 @@ public class Main {
         selectedAccount=null;
         while (selectedAccount == null) {
             System.out.print("Email or name:");
-            String input1 = sr.nextLine();
+            String input1 = sr.nextLine().trim();
             System.out.print("Password:");
-            String input2 = sr.nextLine();
+            String input2 = sr.nextLine().trim();
             for (BankAccount bankAccount : arrBank) {
                 if (bankAccount == null) {
                     break;
@@ -65,18 +67,18 @@ public class Main {
         return selectedAccount;
     }
 
-    private static void chooseOperation(BankAccount selectedAccount, BankAccount[] arrBank, int accountCounter, ViewBalance vb) {
-        System.out.printf("""
+    private static void chooseOperation(BankAccount selectedAccount, List<BankAccount> arrBank, int accountCounter, ViewBalance vb) {
+        System.out.print("""
                                 
                 Display(1)
                 Deposit(2)
                 Withdraw(3)
                 Transfer(4)
                 Change Account(5)
-                Create New Account (Bank has %s empty location)(6)
+                Create New Account(6)
                 Display balance(7)
                 Exit(-1)
-                Enter (int):""", (10 - accountCounter));
+                Enter (int):""");
         Scanner sr = new Scanner(System.in);
         switch (sr.nextInt()) {
             case 1 -> {
@@ -114,18 +116,16 @@ public class Main {
                 chooseOperation(selectedAccount,arrBank,accountCounter,vb);
             }
             case 6 -> {
-                if (accountCounter < 10) {
-                    arrBank[accountCounter] = new BankAccount(arrBank);
-                    selectedAccount=arrBank[accountCounter];
-                    System.out.println(arrBank[accountCounter]);
+                    selectedAccount=new BankAccount(arrBank);
+                    arrBank.add(selectedAccount);
+                    System.out.println(selectedAccount);
                     accountCounter++;
                     chooseOperation(selectedAccount, arrBank, accountCounter,vb);
-
-                } else {
-                    System.out.println("Bank is full please delete some account.");
-                }
             }
-            case 7 -> vb.viewMethode(selectedAccount);
+            case 7 -> {
+                vb.viewMethode(selectedAccount);
+                chooseOperation(selectedAccount,arrBank, accountCounter, vb);
+            }
             case -1 -> {
                 System.out.print("Do you want to Exit?\nYes(1),No(2):");
                 if (sr.nextInt() == 1) {
